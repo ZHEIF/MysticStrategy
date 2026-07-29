@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>玄策·天机</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">玄</div>
+          <div>
+            <p class="eyebrow">玄策·天机</p>
+            <h1>玄策·天机</h1>
+          </div>
+        </div>
+
+        <div class="status-group">
+          <div id="apiStatus" class="status-chip">DeepSeek 检查中</div>
+          <div id="modelStatus" class="status-chip muted">模型 -</div>
+        </div>
+
+        <nav class="mode-tabs" aria-label="模式切换">
+          <button id="tabSelf" class="tab active" type="button" data-mode="self">自我分析</button>
+          <button id="tabFriends" class="tab" type="button" data-mode="friends">关系分析</button>
+        </nav>
+      </header>
+
+      <main class="workspace">
+        <section class="panel form-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">输入</p>
+              <h2>参数</h2>
+            </div>
+            <button id="clearDrafts" class="ghost-btn" type="button">↻ 清空缓存</button>
+          </div>
+
+          <form id="selfForm" class="form-stack">
+            <div class="grid two">
+              <label>
+                <span>姓名</span>
+                <input id="selfName" name="name" type="text" maxlength="40" autocomplete="off" placeholder="你的姓名">
+              </label>
+              <label>
+                <span>出生地</span>
+                <input id="selfBirthPlace" name="birth_place" type="text" maxlength="60" autocomplete="off" placeholder="出生城市 / 地区">
+              </label>
+            </div>
+
+            <label>
+              <span>出生日期</span>
+              <input id="selfBirthDate" name="birth_date" type="date">
+            </label>
+
+            <label>
+              <span>近期主要规划</span>
+              <textarea id="selfRecentPlans" name="recent_plans" rows="5" maxlength="4000" placeholder="工作、学业、迁移、创业、考试等"></textarea>
+            </label>
+
+            <label>
+              <span>重要发展经历</span>
+              <textarea id="selfMajorExperiences" name="major_experiences" rows="5" maxlength="4000" placeholder="影响你当前状态的关键经历"></textarea>
+            </label>
+
+            <div class="actions">
+              <button id="analyzeSelf" class="primary-btn" type="button">→ 开始分析</button>
+            </div>
+          </form>
+
+          <form id="friendsForm" class="form-stack" hidden>
+            <div class="friends-toolbar">
+              <div class="grid two">
+                <label>
+                  <span>你的关系倾向</span>
+                  <input id="myRelationshipTendency" type="text" maxlength="120" autocomplete="off" placeholder="更熟络 / 保持距离 / 合作优先 / 暂缓推进">
+                </label>
+                <div class="inline-note">多朋友模式可逐个分析，再给整体策略。</div>
+              </div>
+              <button id="addFriend" class="ghost-btn" type="button">＋ 添加朋友</button>
+            </div>
+
+            <div id="friendList" class="friend-list"></div>
+
+            <div class="actions">
+              <button id="analyzeFriends" class="primary-btn" type="button">→ 开始分析</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel result-panel">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">输出</p>
+              <h2>结果</h2>
+            </div>
+            <div id="resultMeta" class="result-meta"></div>
+          </div>
+          <div id="resultBody" class="result-body">
+            <div class="empty-state">等待输入。</div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="accessCodeModal" class="access-code-modal" hidden aria-hidden="true">
+      <button id="accessCodeBackdrop" class="access-code-backdrop" type="button" aria-label="关闭访问码弹窗"></button>
+      <div class="access-code-dialog" role="dialog" aria-modal="true" aria-labelledby="accessCodeTitle">
+        <div class="access-code-head">
+          <div>
+            <p class="eyebrow">安全验证</p>
+            <h2 id="accessCodeTitle">输入访问码</h2>
+          </div>
+          <button id="accessCodeClose" class="icon-btn" type="button" aria-label="关闭">×</button>
+        </div>
+        <p id="accessCodeHint" class="access-code-hint">当前需要访问码才能调用 DeepSeek。</p>
+        <label>
+          <span>访问码</span>
+          <input id="accessCodeInput" type="password" autocomplete="off" placeholder="输入访问码">
+        </label>
+        <div id="accessCodeError" class="access-code-error" hidden></div>
+        <div class="actions access-code-actions">
+          <button id="accessCodeSubmit" class="primary-btn" type="button">确认</button>
+        </div>
+      </div>
+    </div>
+
+    <template id="friendCardTemplate">
+      <article class="friend-card">
+        <div class="friend-card-head">
+          <strong class="friend-title">朋友</strong>
+          <button class="icon-btn remove-friend" type="button" aria-label="删除朋友">×</button>
+        </div>
+        <label>
+          <span>姓名</span>
+          <input data-field="name" type="text" maxlength="40" autocomplete="off" placeholder="朋友姓名">
+        </label>
+        <div class="grid two">
+          <label>
+            <span>出生日期</span>
+            <input data-field="birth_date" type="date">
+          </label>
+          <label>
+            <span>关系倾向</span>
+            <input data-field="relationship_tendency" type="text" maxlength="120" autocomplete="off" placeholder="更近一些 / 仅合作 / 暂缓">
+          </label>
+        </div>
+        <label>
+          <span>近期主要规划</span>
+          <textarea data-field="recent_plans" rows="4" maxlength="4000" placeholder="他们近期正在做什么"></textarea>
+        </label>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
